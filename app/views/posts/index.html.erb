@@ -1,0 +1,44 @@
+<h1>Posts#index</h1>
+<p>Find me in app/views/posts/index.html.erb</p>
+<% @posts.each do |post| %>
+  <div><%= link_to post.title, "/show/#{post.id}" %></div> <a href="#" class="reply-display">返信</a>
+  <div class="reply" style="display: none">
+    <%= form_for @comment, url: comment_create_path do |f| %>
+      <%= f.text_area :content %>
+      <input type="hidden" name="comment[post_id]" value="<%= post.id %>">
+      <%= f.submit %>
+    <% end %>
+  </div>
+  <% post.comments.each do |comment| %>
+    <% if !comment.parent_id %>
+      <div>コメント<%= comment.content %></div><a href="#" class="reply-display">返信</a>
+    <% else %>
+      <div style="margin-right: <%= 30 + comment.id.to_i %>px">返信：<%= comment.content %></div><a href="#" class="reply-display">返信</a>
+    <% end %>
+    <div class="reply" style="display: none">
+    <%= form_for @comment, url: comment_create_path do |f| %>
+      <%= f.text_area :content %>
+      <input type="hidden" name="comment[post_id]" value="<%= post.id %>">
+      <input type="hidden" name="comment[parent_id]" value="<%= comment.id %>">
+      <%= f.submit %>
+    <% end %>
+  </div>
+  <% end %>
+<% end %>
+
+<h2>投稿フォーム</h2>
+<%= form_for @post, url: create_path do |f| %>
+  タイトル：<%= f.text_field :title %>
+  コンテント：<%= f.text_field :content %>
+  <%= f.submit %>
+<% end %>
+
+<script>
+    const replies = document.querySelectorAll(".reply-display").forEach((rp) => {
+      rp.addEventListener('click', (rf) => {
+        rf.preventDefault();
+        rp.nextElementSibling.style = 'display: block;'
+      })
+    })
+    console.log(replies)
+</script>
